@@ -350,10 +350,19 @@ if (newsFeed) {
   });
   viewerUpdates.observe(document.body, { childList: true });
 
-  const script = document.createElement("script");
-  script.src = newsFeed.dataset.trustindexFeed;
-  script.async = true;
-  newsFeed.append(script);
+  const loadWidget = (retry = false) => {
+    const script = document.createElement("script");
+    script.src = newsFeed.dataset.trustindexFeed;
+    script.async = true;
+    if (retry) {
+      script.addEventListener("error", () => {
+        script.remove();
+        setTimeout(loadWidget, 1200);
+      }, { once: true });
+    }
+    newsFeed.append(script);
+  };
+  loadWidget(true);
 }
 
 const rates = {
